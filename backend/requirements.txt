@@ -5,3 +5,5 @@ google-api-python-client
 facebook-sdk
 tiktok-api
 pytest
+vosk
+apscheduler
