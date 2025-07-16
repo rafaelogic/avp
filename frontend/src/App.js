@@ -3,6 +3,7 @@ import Templates from './Templates';
 import Audio from './Audio';
 import Schedule from './Schedule';
 import Analytics from './Analytics';
+import ProgressBar from './ProgressBar';
 
 function App() {
   const [text, setText] = useState('');
@@ -14,10 +15,11 @@ function App() {
   const [music, setMusic] = useState('');
   const [soundEffect, setSoundEffect] = useState('');
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
+  const [progress, setProgress] = useState('');
 
   const handleGenerate = async (e) => {
     e.preventDefault();
-    setStatus('Generating video...');
+    setProgress('Sending prompt to AI');
     try {
       const formData = new FormData();
       formData.append('text', text);
@@ -34,18 +36,21 @@ function App() {
         method: 'POST',
         body: formData,
       });
+      setProgress('Generating video');
       const data = await response.json();
       setStatus(data.message);
       if (data.output && data.output.path) {
         setVideoPath(data.output.path);
+        setProgress('Done');
       }
     } catch (error) {
       setStatus('Error generating video.');
+      setProgress('');
     }
   };
 
   const handleUpload = async (platform) => {
-    setStatus(`Uploading to ${platform}...`);
+    setProgress(`Uploading to ${platform}`);
     try {
       const response = await fetch(`/upload_to_${platform}`, {
         method: 'POST',
@@ -56,8 +61,10 @@ function App() {
       });
       const data = await response.json();
       setStatus(data.message);
+      setProgress('Done');
     } catch (error) {
       setStatus(`Error uploading to ${platform}.`);
+      setProgress('');
     }
   };
 
@@ -113,6 +120,7 @@ function App() {
           Generate Video
         </button>
       </form>
+      <ProgressBar status={progress} />
       <Templates onSelectTemplate={setTemplate} />
       <Audio onSelectMusic={setMusic} onSelectSoundEffect={setSoundEffect} />
       {videoPath && (
