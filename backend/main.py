@@ -46,6 +46,25 @@ from typing import List
 from . import subtitles
 from .scheduler import scheduler
 from datetime import datetime
+import openai
+
+class ScriptRequest(BaseModel):
+    prompt: str
+
+@app.post("/generate_script")
+async def generate_script(request: ScriptRequest):
+    try:
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that writes video scripts."},
+                {"role": "user", "content": request.prompt},
+            ],
+        )
+        return {"status": "success", "script": response.choices[0].message.content}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 class ScheduleRequest(BaseModel):
     platform: str

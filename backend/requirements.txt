@@ -7,3 +7,4 @@ tiktok-api
 pytest
 vosk
 apscheduler
+openai

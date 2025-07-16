@@ -6,6 +6,7 @@ import Analytics from './Analytics';
 import ProgressBar from './ProgressBar';
 
 function App() {
+  const [prompt, setPrompt] = useState('');
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
   const [videoPath, setVideoPath] = useState('');
@@ -16,6 +17,29 @@ function App() {
   const [soundEffect, setSoundEffect] = useState('');
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [progress, setProgress] = useState('');
+
+  const handleGenerateScript = async (e) => {
+    e.preventDefault();
+    setStatus('Generating script...');
+    try {
+      const response = await fetch('/generate_script', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setText(data.script);
+        setStatus('Script generated successfully.');
+      } else {
+        setStatus('Error generating script.');
+      }
+    } catch (error) {
+      setStatus('Error generating script.');
+    }
+  };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -71,6 +95,24 @@ function App() {
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">AI Video Generator</h1>
+      <form onSubmit={handleGenerateScript} className="w-full max-w-lg mb-8">
+        <div className="flex flex-col mb-4">
+          <label htmlFor="prompt" className="mb-2 text-lg">Enter a prompt to generate a script:</label>
+          <input
+            type="text"
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="bg-gray-800 text-white p-4 rounded-lg"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+        >
+          Generate Script
+        </button>
+      </form>
       <form onSubmit={handleGenerate} className="w-full max-w-lg">
         <div className="flex flex-col mb-4">
           <label htmlFor="text" className="mb-2 text-lg">Enter your script:</label>
