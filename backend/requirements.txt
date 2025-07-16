@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+runwayml
+google-api-python-client
+facebook-sdk
+tiktok-api
+pytest
